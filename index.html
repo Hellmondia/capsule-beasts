@@ -35,6 +35,184 @@ h1{color:#bff2ff;margin:0 0 10px}
 .hit{animation:hit .25s steps(3)}@keyframes hit{50%{filter:brightness(2);transform:translateX(18px)}}.evo{animation:evo 1s}@keyframes evo{50%{filter:brightness(3);transform:scale(1.25) rotate(8deg)}}.shake{animation:shake .25s}@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
 #battlePanel{position:absolute;left:8px;right:8px;bottom:8px;background:#17264c;border:4px solid #8ce4ff;border-radius:20px;padding:10px}#text{font-weight:800;min-height:44px;font-size:17px;margin-bottom:8px}#battleBtns,#moves{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-height:760px){#myMon{bottom:315px}#playerHud{bottom:230px}.mon{width:108px;height:108px}.panel{bottom:190px}}
+
+/* === Upgraded creature sprites === */
+.spriteBody{
+  position:absolute;
+  inset:8px;
+  border:5px solid #111;
+  z-index:4;
+  box-shadow:
+    inset -16px -16px rgba(0,0,0,.35),
+    inset 10px 10px rgba(255,255,255,.35),
+    0 18px 28px rgba(0,0,0,.55);
+}
+.beastShape0{border-radius:48% 48% 35% 35%}
+.beastShape1{border-radius:58% 35% 44% 30%}
+.beastShape2{border-radius:30% 60% 35% 55%}
+.beastShape3{border-radius:26px 48px 32px 54px}
+.beastShape4{border-radius:50% 50% 22% 22%}
+.beastShape5{border-radius:35% 35% 58% 58%}
+.beastShape6{border-radius:25% 58% 25% 58%}
+.beastShape7{border-radius:62% 30% 62% 30%}
+.beastShape8{border-radius:40% 50% 50% 25%}
+.beastShape9{border-radius:30% 45% 60% 35%}
+.spriteEye{position:absolute;top:35px;width:16px;height:23px;background:#080b12;border-radius:5px;z-index:8;box-shadow:inset 4px 4px #fff8}
+.eyeL{left:29px}.eyeR{right:29px}
+.spriteMouth{position:absolute;left:40px;top:78px;width:38px;height:9px;background:#080b12;border-radius:12px;z-index:8}
+.spriteBelly{position:absolute;left:31px;bottom:14px;width:52px;height:38px;border:4px solid #111;border-radius:50%;opacity:.62;z-index:5}
+.spriteShine{position:absolute;left:22px;top:18px;width:28px;height:22px;background:rgba(255,255,255,.35);border-radius:50%;z-index:7}
+.spriteHorn{position:absolute;left:40px;top:-31px;width:32px;height:42px;background:#ffe08a;border:5px solid #111;clip-path:polygon(50% 0,100% 100%,0 100%);z-index:10}
+.spriteEar{position:absolute;top:-20px;width:31px;height:43px;border:5px solid #111;clip-path:polygon(50% 0,100% 100%,0 100%);z-index:6}
+.earL{left:17px;transform:rotate(-22deg)}.earR{right:17px;transform:rotate(22deg)}
+.spriteSpikes{position:absolute;left:10px;right:10px;top:-15px;height:23px;background:repeating-linear-gradient(90deg,#f7fbff 0 9px,transparent 9px 18px);clip-path:polygon(0 100%,10% 0,20% 100%,30% 0,40% 100%,50% 0,60% 100%,70% 0,80% 100%,90% 0,100% 100%);z-index:11}
+.spriteWing{position:absolute;top:39px;width:50px;height:44px;border:5px solid #111;z-index:1;opacity:.95}
+.leftWing{left:-28px;transform:skewY(-25deg) rotate(-12deg);border-radius:35px 8px 35px 8px}
+.rightWing{right:-28px;transform:skewY(25deg) rotate(12deg);border-radius:8px 35px 8px 35px}
+.spriteTail{position:absolute;right:-34px;bottom:29px;width:55px;height:31px;border:5px solid #111;border-left:0;border-radius:0 35px 35px 0;z-index:1}
+.spriteLeg{position:absolute;bottom:-8px;width:30px;height:30px;border:5px solid #111;border-radius:0 0 18px 18px;z-index:2;box-shadow:inset -5px -5px rgba(0,0,0,.35)}
+.legL{left:29px}.legR{right:29px}
+
+</style>
+</head>
+<body>
+<div id="game">
+<div id="start"><div class="card"><h1>Capsule Beasts Complete</h1><p>Volledige mobiele RPG: 300 monsters, map, gebouwen, healing center, shop, NPC's, battles, captures, evoluties, Dex en save/load.</p><button id="startBtn">Start avontuur</button></div></div>
+<div id="world">
+<div id="top"><span id="loc">Town</span><span>€<span id="money">300</span></span><span>Caps: <span id="caps">10</span></span><button id="saveBtn">Save</button><button id="loadBtn">Load</button><button id="dexBtn">Dex</button><button id="bagBtn">Bag</button></div>
+<div id="map"></div><div id="npcLayer"></div><div id="player"></div>
+<div id="dpad"><button class="dp" id="up">▲</button><button class="dp" id="left">◀</button><button class="dp" id="right">▶</button><button class="dp" id="down">▼</button></div>
+<div id="rightBtns"><button id="actBtn">Actie</button><button id="teamBtn">Team</button></div>
+<div id="teamPanel" class="panel"></div><div id="dexPanel" class="panel"></div><div id="bagPanel" class="panel"></div><div id="msgPanel" class="panel"></div>
+</div>
+<div id="battle">
+<div id="enemyHud" class="hud"></div><div id="playerHud" class="hud"></div><div id="enemyMon" class="mon"></div><div id="myMon" class="mon"></div>
+<div id="battlePanel"><div id="text">Battle!</div><div id="battleBtns"><button id="fightBtn">Vecht</button><button id="catchBtn">Vang</button><button id="itemBtn">Item</button><button id="runBtn">Vlucht</button></div><div id="moves" style="display:none"></div></div>
+</div>
+</div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const ELEMENTS=["Fire","Water","Nature","Electric","Ice","Shadow","Light","Earth","Wind","Metal","Psychic","Toxic"];
+const COLORS={Fire:"#ff6b4a",Water:"#4ab7ff",Nature:"#61d66f",Electric:"#ffd84a",Ice:"#9df1ff",Shadow:"#6b54d6",Light:"#fff49a",Earth:"#a77a4f",Wind:"#c8f2ff",Metal:"#aeb8c8",Psychic:"#ff8ee4",Toxic:"#9dff57"};
+const STRONG={Fire:["Nature","Ice"],Water:["Fire","Earth"],Nature:["Water","Earth"],Electric:["Water","Wind"],Ice:["Nature","Wind"],Shadow:["Light","Psychic"],Light:["Shadow","Toxic"],Earth:["Electric","Metal"],Wind:["Nature","Toxic"],Metal:["Ice","Light"],Psychic:["Metal","Toxic"],Toxic:["Nature","Psychic"]};
+const RESIST={Fire:["Fire","Nature"],Water:["Water","Ice"],Nature:["Nature","Electric"],Electric:["Electric","Metal"],Ice:["Ice","Water"],Shadow:["Shadow","Psychic"],Light:["Light","Shadow"],Earth:["Earth","Toxic"],Wind:["Wind","Earth"],Metal:["Metal","Nature"],Psychic:["Psychic","Light"],Toxic:["Toxic","Fire"]};
+const SYL=["Axo","Luna","Pyro","Mizu","Terra","Venti","Noct","Lumi","Toxi","Ferro","Psy","Glaci","Bram","Zara","Kiro","Nebu","Volt","Moro","Cava","Rift"];
+const TAILS=["ling","pup","rex","fin","horn","wing","shade","bloom","claw","geist","orb","moth","fang","shell","drake","root","spark","mire","nova","tail"];
+function moveSet(el){let st=["burn","poison","freeze","stun","sleep"];return["Tap","Bite","Rush","Burst"].map((n,i)=>({name:el+" "+n,el,power:[30,45,60,78][i],status:i===2?st[ELEMENTS.indexOf(el)%st.length]:null}))}
+function buildDex(){let a=[];for(let i=0;i<300;i++){let st=i%3,el=ELEMENTS[i%ELEMENTS.length],el2=i%5===0?ELEMENTS[(i+4)%12]:null,base=30+(i%40)+st*12,line=i-st,evo=null;if(st<2&&line+st+1<300)evo=line+st+1;let name=SYL[i%SYL.length]+TAILS[(i*7)%TAILS.length]+(st===1?"o":st===2?"ar":"");a.push({id:i,name,el,el2,color:COLORS[el],accent:COLORS[el2||el],stage:st,evo,evoLevel:st===0?8+i%10:20+i%12,method:st===0?(i%4===0?"stone":i%7===0?"friendship":"level"):"level",rarity:1+i%6,captureRate:80-(i%6)*8-st*7,curve:["fast","medium","slow"][i%3],hp:base+28,atk:base+8+i%9,def:base+6+(i*3)%9,spd:base+5+(i*5)%9,moves:moveSet(el)});}return a}
+const DEX=buildDex();
+const MAPS={
+town:{name:"Starter Town",spawn:{x:7,y:7},tiles:["################","#....gggg..c...#","#..CCC..SSS....#","#..Cdc..SdS....#","#..............#","#..HHH...vvv...#","#..HdH...sss...#","#......pppp....#","#......p..p....#","#..ggg.p..p.dd.#","#..ggg....p.dd.#","#..............#","################"],npcs:[{name:"Mila",x:10,y:7,msg:"Welkom! Rood is het Healing Center. Geel is de Shop. Donker gras geeft encounters.",walk:true},{name:"Ranger",x:4,y:10,msg:"Tip: verzwak monsters voordat je capsules gooit.",walk:true},{name:"Trainer Bo",x:12,y:9,msg:"Battle!",trainer:true,walk:false}]},
+center:{name:"Healing Center",spawn:{x:3,y:5},tiles:["#######","#.....#","#.NNN.#","#.....#","#.....#","#..D..#","#######"],npcs:[{name:"Nurse",x:3,y:2,msg:"Je team is genezen!",heal:true,walk:false}]},
+shop:{name:"Capsule Shop",spawn:{x:3,y:5},tiles:["#######","#.....#","#.KKK.#","#.....#","#.....#","#..D..#","#######"],npcs:[{name:"Shopkeeper",x:3,y:2,msg:"Welkom in mijn winkel!",shop:true,walk:false}]},
+house:{name:"House",spawn:{x:3,y:5},tiles:["#######","#.....#","#..T..#","#.....#","#.....#","#..D..#","#######"],npcs:[{name:"Old Tamer",x:3,y:2,msg:"Monsters evolueren via level, rare stones of vriendschap.",walk:false}]}
+};
+let S={map:"town",x:7,y:7,money:300,caps:{normal:10,ultra:3,dark:1,elemental:1},potions:3,stones:2,capsule:"normal",team:[],box:[],seen:{},caught:{},inBattle:false,trainerWins:0};
+let B=null,npcs=[];
+function makeMon(id,lvl){let d=DEX[id];return{uid:Date.now()+Math.random(),id,lvl,xp:0,hp:maxHp(d,lvl),status:null,friend:0}}
+function maxHp(d,l){return d.hp+l*5}
+function stat(d,l,k){return d[k]+l*3}
+function xpNeed(l,c){return c==="fast"?18+l*l*4:c==="slow"?35+l*l*7:25+l*l*5}
+function start(){S.team=[makeMon(0,5),makeMon(3,4),makeMon(6,4)];$("start").style.display="none";$("world").style.display="block";loadMap("town",7,7)}
+function current(){return MAPS[S.map]}
+function tileAt(x,y){return current().tiles[y]&&current().tiles[y][x]}
+function pass(x,y){let t=tileAt(x,y);return t&&t!=="#"}
+function classFor(ch){return ch==="#"?"wall":ch==="g"?"tall":ch==="w"?"water":ch==="m"?"cave":ch==="v"?"volcano":ch==="s"?"snow":ch==="e"?"electric":ch==="d"?"dark":ch==="c"?"crystal":ch==="C"?"center":ch==="S"?"shop":ch==="H"?"house":ch==="D"||ch==="d"?"door":ch==="N"||ch==="K"?"counter":ch==="p"?"path":"grass"}
+function loadMap(name,x,y){S.map=name;S.x=x;S.y=y;drawMap();drawPlayer();loadNpcs();updateUi()}
+function drawMap(){let m=$("map");m.innerHTML="";let rows=current().tiles;for(let y=0;y<rows.length;y++)for(let x=0;x<rows[y].length;x++){let e=document.createElement("div"),ch=rows[y][x];e.className="tile "+classFor(ch);e.style.left=x*48+"px";e.style.top=70+y*48+"px";m.appendChild(e)}}
+function drawPlayer(){$("player").style.left=S.x*48+7+"px";$("player").style.top=70+S.y*48+2+"px"}
+function loadNpcs(){npcs=current().npcs.map(n=>({...n}));drawNpcs()}
+function drawNpcs(){let l=$("npcLayer");l.innerHTML="";npcs.forEach((n,i)=>{let e=document.createElement("div");e.className="npc";e.id="npc"+i;e.style.left=n.x*48+7+"px";e.style.top=70+n.y*48+2+"px";l.appendChild(e)})}
+function npcAt(x,y){return npcs.find(n=>n.x===x&&n.y===y)}
+function biomeFor(t){return t==="v"?"Volcano":t==="s"?"Snow biome":t==="d"?"Dark forest":t==="c"||t==="w"?"Crystal lake":t==="m"?"Caves":"Grasslands"}
+function move(dx,dy){if(S.inBattle)return;let nx=S.x+dx,ny=S.y+dy;if(!pass(nx,ny)||npcAt(nx,ny))return;S.x=nx;S.y=ny;drawPlayer();handleTile()}
+function handleTile(){let t=tileAt(S.x,S.y);if(t==="d"){if(S.map==="town"&&S.x>=2&&S.x<=4)loadMap("center",3,5);else if(S.map==="town"&&S.x>=8&&S.x<=10)loadMap("shop",3,5);else if(S.map==="town")loadMap("house",3,5)}if(t==="D")loadMap("town",7,7);if(["g","v","s","d","c","w"].includes(t)&&Math.random()<.28)wildEncounter(biomeFor(t));updateUi()}
+function wildEncounter(b){let pools={Grasslands:[0,1,2,3,36,37,72,73,108,109],Volcano:[24,25,26,60,61,120,121,180,181],["Snow biome"]:[48,49,50,144,145,192,193,240,241],["Dark forest"]:[6,7,8,66,67,150,151,222,223],["Crystal lake"]:[12,13,14,30,31,90,91,210,211],Caves:[84,85,86,96,97,132,133,168,169]};let ids=pools[b]||pools.Grasslands,id=ids[Math.floor(Math.random()*ids.length)];startBattle(makeMon(id,3+Math.floor(Math.random()*8)),false)}
+function action(){let n=npcs.find(n=>Math.abs(n.x-S.x)+Math.abs(n.y-S.y)<=1);if(!n){showMessage("Niemand om mee te praten.");return}if(n.heal){S.team.forEach(m=>{m.hp=maxHp(DEX[m.id],m.lvl);m.status=null});showMessage("Nurse: je team is volledig genezen!")}else if(n.shop)showShop();else if(n.trainer)startBattle(makeMon(20+S.trainerWins,6+S.trainerWins),true);else showMessage(n.name+": "+n.msg)}
+function npcWalk(){if(S.inBattle)return;npcs.forEach(n=>{if(!n.walk)return;let dirs=[[1,0],[-1,0],[0,1],[0,-1],[0,0]],d=dirs[Math.floor(Math.random()*dirs.length)],nx=n.x+d[0],ny=n.y+d[1];if(pass(nx,ny)&&!(nx===S.x&&ny===S.y)&&!npcAt(nx,ny)){n.x=nx;n.y=ny}});drawNpcs()}setInterval(npcWalk,1200);
+function active(){return S.team.find(m=>m.hp>0)||S.team[0]}
+function startBattle(enemy,trainer){S.inBattle=true;B={enemy,trainer};S.seen[enemy.id]=1;$("battle").style.display="block";$("moves").style.display="none";$("battleBtns").style.display="grid";setText((trainer?"Trainer stuurt ":"Een wilde ")+DEX[enemy.id].name+" uit!");renderBattle()}
+function monsterArt(el,d){
+  const shape=d.id%10;
+  const horn=d.id%3===0;
+  const wings=d.id%4===0;
+  const tail=d.id%5!==0;
+  const spikes=d.id%6===0;
+  const legs=d.id%2===0;
+  const ears=d.id%7!==0;
+
+  el.style.background="transparent";
+
+  el.innerHTML=`
+    ${wings?`
+      <div class="spriteWing leftWing" style="background:${d.accent}"></div>
+      <div class="spriteWing rightWing" style="background:${d.accent}"></div>
+    `:""}
+
+    ${tail?`
+      <div class="spriteTail" style="background:${d.accent}"></div>
+    `:""}
+
+    ${legs?`
+      <div class="spriteLeg legL" style="background:${d.color}"></div>
+      <div class="spriteLeg legR" style="background:${d.color}"></div>
+    `:""}
+
+    <div class="spriteBody beastShape${shape}" style="background:${d.color}">
+      ${ears?`
+        <div class="spriteEar earL" style="background:${d.accent}"></div>
+        <div class="spriteEar earR" style="background:${d.accent}"></div>
+      `:""}
+
+      ${horn?`<div class="spriteHorn"></div>`:""}
+      ${spikes?`<div class="spriteSpikes"></div>`:""}
+
+      <div class="spriteEye eyeL"></div>
+      <div class="spriteEye eyeR"></div>
+      <div class="spriteShine"></div>
+      <div class="spriteBelly" style="background:${d.accent}"></div>
+      <div class="spriteMouth"></div>
+    </div>
+  `;
+}
+function hud(m){let d=DEX[m.id],h=maxHp(d,m.lvl),p=Math.max(0,m.hp/h*100);return`<b>${d.name}</b> Lv.${m.lvl} <span class=tag>${d.el}${d.el2?"/"+d.el2:""}</span><div class=bar><span style="width:${p}%"></span></div><span class=small>HP ${Math.max(0,m.hp)}/${h} ${m.status?("· "+m.status):""}</span>`}
+function renderBattle(){let p=active(),e=B.enemy;monsterArt($("myMon"),DEX[p.id]);monsterArt($("enemyMon"),DEX[e.id]);$("playerHud").innerHTML=hud(p);$("enemyHud").innerHTML=hud(e);updateUi()}
+function mult(moveEl,d){let m=1;if(STRONG[moveEl]?.includes(d.el))m*=1.6;if(d.el2&&STRONG[moveEl]?.includes(d.el2))m*=1.35;if(RESIST[d.el]?.includes(moveEl))m*=.65;if(d.el2&&RESIST[d.el2]?.includes(moveEl))m*=.75;return m}
+function damage(a,b,move){let ad=DEX[a.id],bd=DEX[b.id],m=mult(move.el,bd),crit=Math.random()<.08?1.8:1,dodge=Math.random()<Math.max(.02,(stat(bd,b.lvl,"spd")-stat(ad,a.lvl,"spd"))/500);if(dodge)return{amount:0,text:" miste!"};return{amount:Math.max(2,Math.floor((stat(ad,a.lvl,"atk")/Math.max(12,stat(bd,b.lvl,"def")))*move.power*m*crit/2.6)),text:(m>1.2?" Super effectief!":m<.8?" Niet effectief.":"")+(crit>1?" Critical!":"")}}
+function showMoves(){let d=DEX[active().id];$("battleBtns").style.display="none";$("moves").style.display="grid";$("moves").innerHTML=d.moves.map((m,i)=>`<button onclick="useMove(${i})">${m.name}<br><span class=small>${m.el} ${m.power}</span></button>`).join("")+`<button onclick="backBtns()">Terug</button>`}
+function backBtns(){$("moves").style.display="none";$("battleBtns").style.display="grid"}
+function applyStatus(t,m){if(m.status&&!t.status&&Math.random()<.35)t.status=m.status}
+function statusTick(m){if(!m.status)return "";let hp=maxHp(DEX[m.id],m.lvl);if(m.status==="burn"||m.status==="poison"){m.hp-=Math.ceil(hp*.06);return m.status+" doet schade."}if(m.status==="sleep"&&Math.random()<.45)return "slaapt nog.";if(m.status==="freeze"&&Math.random()<.45)return "is bevroren.";if(m.status==="stun"&&Math.random()<.35)return "is verlamd.";return ""}
+function useMove(i){let p=active(),e=B.enemy,m=DEX[p.id].moves[i],r=damage(p,e,m);if(r.amount){e.hp-=r.amount;applyStatus(e,m);$("enemyMon").classList.add("hit");setTimeout(()=>$("enemyMon").classList.remove("hit"),250)}setText(DEX[p.id].name+" gebruikt "+m.name+"."+r.text);renderBattle();if(e.hp<=0){winBattle();return}setTimeout(enemyTurn,650)}
+function enemyTurn(){let e=B.enemy,p=active(),skip=statusTick(e);if(e.hp<=0){winBattle();return}if(skip){setText(DEX[e.id].name+" "+skip);renderBattle();return}let m=DEX[e.id].moves[Math.floor(Math.random()*4)],r=damage(e,p,m);if(r.amount){p.hp-=r.amount;applyStatus(p,m);$("myMon").classList.add("hit");setTimeout(()=>$("myMon").classList.remove("hit"),250)}setText(DEX[e.id].name+" gebruikt "+m.name+"."+r.text);renderBattle();if(p.hp<=0&&!S.team.find(x=>x.hp>0)){setText("Je team verloor. Je wordt genezen.");setTimeout(()=>{S.team.forEach(x=>{x.hp=maxHp(DEX[x.id],x.lvl);x.status=null});endBattle()},900)}}
+function winBattle(){let p=active(),gain=20+B.enemy.lvl*8;p.xp+=gain;p.friend+=3;S.money+=B.trainer?80:25;if(B.trainer)S.trainerWins++;setText("Gewonnen! +"+gain+" XP en geld.");levelUp(p);setTimeout(endBattle,900)}
+function levelUp(m){let d=DEX[m.id];while(m.xp>=xpNeed(m.lvl,d.curve)){m.xp-=xpNeed(m.lvl,d.curve);m.lvl++;m.hp=maxHp(d,m.lvl);checkEvolution(m);d=DEX[m.id]}}
+function checkEvolution(m){let d=DEX[m.id];if(d.evo==null)return false;let ok=(d.method==="level"&&m.lvl>=d.evoLevel)||(d.method==="stone"&&S.stones>0&&m.lvl>=d.evoLevel)||(d.method==="friendship"&&m.friend>=12);if(!ok)return false;if(d.method==="stone")S.stones--;m.id=d.evo;m.hp=maxHp(DEX[m.id],m.lvl);$("myMon").classList.add("evo");setTimeout(()=>$("myMon").classList.remove("evo"),1000);return true}
+function capture(){if(B.trainer){setText("Je mag trainer-monsters niet vangen!");return}let e=B.enemy,d=DEX[e.id];if(S.caps[S.capsule]<=0){setText("Geen "+S.capsule+" capsules.");return}S.caps[S.capsule]--;let hp=e.hp/maxHp(d,e.lvl),bonus={normal:1,ultra:1.7,dark:d.el==="Shadow"?2:1,elemental:1.3}[S.capsule],status=e.status?1.25:1,chance=(d.captureRate/100)*(1.25-hp)*bonus*status/(d.rarity*.35);setText("Je gooit een "+S.capsule+" capsule...");setTimeout(()=>{if(Math.random()<chance){S.caught[e.id]=1;let c=JSON.parse(JSON.stringify(e));if(S.team.length<6)S.team.push(c);else S.box.push(c);setText(d.name+" gevangen!");setTimeout(endBattle,700)}else{setText(d.name+" breekt los!");setTimeout(enemyTurn,600)}renderBattle()},500)}
+function useItem(){if(S.potions<=0){chooseCap();return}let p=active();S.potions--;p.hp=Math.min(maxHp(DEX[p.id],p.lvl),p.hp+35);p.status=null;setText("Potion gebruikt. HP en status hersteld.");renderBattle();setTimeout(enemyTurn,600)}
+function chooseCap(){let k=Object.keys(S.caps),i=k.indexOf(S.capsule);S.capsule=k[(i+1)%k.length];setText("Capsule: "+S.capsule)}
+function endBattle(){S.inBattle=false;$("battle").style.display="none";$("moves").style.display="none";$("battleBtns").style.display="grid";updateUi()}
+function setText(t){$("text").textContent=t}
+function closePanels(){["teamPanel","dexPanel","bagPanel","msgPanel"].forEach(id=>$(id).style.display="none")}
+function showMessage(t){closePanels();$("msgPanel").style.display="block";$("msgPanel").innerHTML=`<b>${t}</b><br><br><button onclick="closePanels()">OK</button>`}
+function showTeam(){let p=$("teamPanel"),open=p.style.display==="block";closePanels();if(open)return;p.style.display="block";p.innerHTML="<h3>Team</h3>"+S.team.map((m,i)=>{let d=DEX[m.id];return`<div class=row><span><span class=mini style="background:${d.color}"></span> <b>${d.name}</b> Lv.${m.lvl}<br><span class=small>${d.el}${d.el2?"/"+d.el2:""} HP ${m.hp}/${maxHp(d,m.lvl)} XP ${m.xp}/${xpNeed(m.lvl,d.curve)}</span></span><button onclick="checkEvolution(S.team[${i}]);showTeam()">Evolve</button></div>`}).join("")+`<p>Box: ${S.box.length}</p>`}
+function showDex(){let p=$("dexPanel"),open=p.style.display==="block";closePanels();if(open)return;p.style.display="block";p.innerHTML=`<h3>Dex 300</h3><p>Gezien ${Object.keys(S.seen).length}/300 · Gevangen ${Object.keys(S.caught).length}/300</p>`+DEX.map(d=>`<div class=row><span><span class=mini style="background:${d.color}"></span> #${d.id+1} ${S.seen[d.id]||S.caught[d.id]?d.name:"???"}</span><span class=tag>${d.el}</span></div>`).join("")}
+function showBag(){let p=$("bagPanel"),open=p.style.display==="block";closePanels();if(open)return;p.style.display="block";p.innerHTML=`<h3>Bag</h3><p>Potions: ${S.potions}</p><p>Normal: ${S.caps.normal}</p><p>Ultra: ${S.caps.ultra}</p><p>Dark: ${S.caps.dark}</p><p>Elemental: ${S.caps.elemental}</p><p>Rare stones: ${S.stones}</p><p>Actieve capsule: ${S.capsule}</p>`}
+function showShop(){closePanels();let p=$("msgPanel");p.style.display="block";p.innerHTML=`<h3>Shop</h3><p>Geld: €${S.money}</p><button onclick="buy('normal',25)">Koop Normal Capsule €25</button><br><br><button onclick="buy('ultra',70)">Koop Ultra Capsule €70</button><br><br><button onclick="buy('dark',90)">Koop Dark Capsule €90</button><br><br><button onclick="buyPotion()">Koop Potion €35</button><br><br><button onclick="sellStone()">Verkoop Rare Stone +€100</button><br><br><button onclick="closePanels()">Sluit</button>`}
+function buy(type,price){if(S.money<price){showMessage("Niet genoeg geld.");return}S.money-=price;S.caps[type]++;showShop();updateUi()}
+function buyPotion(){if(S.money<35){showMessage("Niet genoeg geld.");return}S.money-=35;S.potions++;showShop();updateUi()}
+function sellStone(){if(S.stones<=0){showMessage("Geen stones om te verkopen.");return}S.stones--;S.money+=100;showShop();updateUi()}
+function saveGame(){localStorage.setItem("capsuleBeastsComplete",JSON.stringify(S));showMessage("Game opgeslagen.")}
+function loadGame(){let raw=localStorage.getItem("capsuleBeastsComplete");if(!raw){showMessage("Geen save gevonden.");return}S=JSON.parse(raw);S.inBattle=false;$("start").style.display="none";$("world").style.display="block";$("battle").style.display="none";loadMap(S.map,S.x,S.y);showMessage("Save geladen.")}
+function updateUi(){$("money").textContent=S.money;$("caps").textContent=`N${S.caps.normal} U${S.caps.ultra} D${S.caps.dark} E${S.caps.elemental}`;$("loc").textContent=current().name}
+function bind(id,fn){let e=$(id);e.addEventListener("click",fn);e.addEventListener("touchstart",x=>{x.preventDefault();fn()},{passive:false})}
+bind("startBtn",start);bind("up",()=>move(0,-1));bind("down",()=>move(0,1));bind("left",()=>move(-1,0));bind("right",()=>move(1,0));bind("actBtn",action);bind("teamBtn",showTeam);bind("dexBtn",showDex);bind("bagBtn",showBag);bind("saveBtn",saveGame);bind("loadBtn",loadGame);bind("fightBtn",showMoves);bind("catchBtn",capture);bind("itemBtn",useItem);bind("runBtn",endBattle);
+window.addEventListener("keydown",e=>{if(e.key==="ArrowUp")move(0,-1);if(e.key==="ArrowDown")move(0,1);if(e.key==="ArrowLeft")move(-1,0);if(e.key==="ArrowRight")move(1,0);if(e.key==="Enter")action()});
+window.__TEST__={DEX,S,start,loadMap,startBattle,makeMon,monsterArt,showDex,showBag,showTeam};
+</script>
+</body>
+</html>@media(max-height:760px){#myMon{bottom:315px}#playerHud{bottom:230px}.mon{width:108px;height:108px}.panel{bottom:190px}}
 </style>
 </head>
 <body>
