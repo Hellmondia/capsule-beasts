@@ -1,173 +1,815 @@
-Kopieer deze hele code in GitHub als index.html:
-
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Capsule Beasts</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Capsule Beasts 300</title>
 <style>
-body{margin:0;background:#0b1020;color:white;font-family:Arial;overflow:hidden}
-#game{position:fixed;inset:0;background:linear-gradient(#78a7ff 0 45%,#3f8a4a 46%)}
-#start{position:absolute;inset:0;background:#101827;display:flex;align-items:center;justify-content:center;z-index:10;text-align:center;padding:24px}
-#card{background:#1d2c55;border:4px solid #8ce4ff;border-radius:22px;padding:24px;max-width:420px}
-button{border:0;border-radius:14px;background:#3659a8;color:white;font-weight:bold;font-size:18px;padding:14px;margin:4px}
+*{box-sizing:border-box;user-select:none;touch-action:manipulation}
+body{margin:0;background:#07101f;color:white;font-family:Arial,sans-serif;overflow:hidden}
+button{border:0;border-radius:14px;background:#3559aa;color:white;font-weight:800;font-size:16px;padding:12px;box-shadow:inset 0 -4px #1a2a55,0 4px 0 #020712}
+button:active{transform:translateY(3px)}
+#game{position:fixed;inset:0;background:linear-gradient(#79a8ff 0 42%,#3f8a4b 43%)}
+#start{position:absolute;inset:0;background:radial-gradient(circle,#263f78,#08101e);display:flex;align-items:center;justify-content:center;z-index:20;text-align:center;padding:22px}
+.card{background:#17264c;border:4px solid #8ce4ff;border-radius:22px;padding:22px;max-width:450px}
+h1{color:#bff2ff;margin:0 0 10px}
 #world{display:none}
+#top{position:absolute;left:8px;right:8px;top:8px;background:#101827dd;border:2px solid #8ce4ff;border-radius:12px;padding:8px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-weight:bold}
+#top button{font-size:13px;padding:7px 9px}
+#map{position:absolute;left:0;top:70px}
 .tile{position:absolute;width:48px;height:48px;background:#4da35a;border:1px solid #35743f}
-.grass{background:#2f8b45}.wall{background:#26314f}.house{background:#d88d3a}
-#player{position:absolute;width:34px;height:42px;background:#2f7cff;border:4px solid #111;border-radius:10px;z-index:3}
-#player:before{content:"";position:absolute;left:6px;top:-16px;width:14px;height:14px;background:#ffd1ad;border:3px solid #111;border-radius:50%}
-#top{position:absolute;left:8px;right:8px;top:8px;background:#101827cc;border:2px solid #8ce4ff;border-radius:12px;padding:8px;font-weight:bold;z-index:4}
-#dpad{position:absolute;left:18px;bottom:22px;width:168px;height:168px;z-index:5}
-.d{position:absolute;width:56px;height:56px}
+.wall{background:#202b49}.grass{background:#257b3d}.water{background:#3b84d8}.cave{background:#6d638b}.volcano{background:#8e4034}.snow{background:#dbe8ff}.electric{background:#aaa23a}.dark{background:#26314f}.crystal{background:#67d0d8}.town{background:#d68c3b}
+#player{position:absolute;width:34px;height:42px;background:#2f7cff;border:4px solid #111;border-radius:10px;z-index:4;transition:left .1s,top .1s}
+#player:before{content:"";position:absolute;left:6px;top:-17px;width:15px;height:15px;background:#ffd1ad;border:3px solid #111;border-radius:50%}
+#dpad{position:absolute;left:18px;bottom:20px;width:168px;height:168px;z-index:7}
+.dp{position:absolute;width:56px;height:56px;border:3px solid #8ce4ff;background:#263e79;font-size:23px}
 #up{left:56px;top:0}#left{left:0;top:56px}#right{left:112px;top:56px}#down{left:56px;top:112px}
-#act{position:absolute;right:20px;bottom:52px;width:118px;height:70px;z-index:5}
-#battle{position:absolute;inset:0;background:linear-gradient(#7ea7ff 0 48%,#427c45 49%);display:none;z-index:8;padding:14px}
-.monster{position:absolute;width:120px;height:120px;border:5px solid #111;border-radius:24px;box-shadow:inset -12px -12px #0003,inset 8px 8px #fff4,0 18px 28px #0008}
-.monster:before,.monster:after{content:"";position:absolute;top:34px;width:15px;height:22px;background:#111;border-radius:4px}
-.monster:before{left:30px}.monster:after{right:30px}
-.mouth{position:absolute;left:40px;top:74px;width:38px;height:8px;background:#111;border-radius:8px}
-#enemyMon{right:46px;top:95px;background:#ffd84a}
-#myMon{left:38px;bottom:245px;background:#ff6b4a}
-#battlePanel{position:absolute;left:10px;right:10px;bottom:10px;background:#17264c;border:4px solid #8ce4ff;border-radius:20px;padding:12px}
-#text{font-size:18px;font-weight:bold;min-height:44px}
-#buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#rightBtns{position:absolute;right:16px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:7}
+#rightBtns button{width:120px;height:54px}
+.panel{display:none;position:absolute;left:8px;right:8px;top:70px;bottom:205px;background:#101827ee;border:3px solid #8ce4ff;border-radius:18px;padding:12px;z-index:12;overflow:auto}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #ffffff22;padding:7px 0}
+.small{font-size:12px;opacity:.85}
+.tag{padding:3px 7px;border-radius:999px;background:#ffffff22;font-size:12px}
+.mini{width:42px;height:42px;border-radius:12px;border:3px solid #111;display:inline-block;box-shadow:inset -5px -5px #0003,inset 3px 3px #fff4}
+#battle{display:none;position:absolute;inset:0;background:linear-gradient(#7ea7ff 0 48%,#3e7442 49%);z-index:15;padding:10px}
+.hud{position:absolute;background:#101827e8;border:3px solid #8ce4ff;border-radius:14px;padding:8px;min-width:205px}
+#enemyHud{right:12px;top:28px}#playerHud{left:12px;bottom:265px}
+.bar{height:11px;background:#071020;border:2px solid #071020;border-radius:8px;overflow:hidden}.bar span{display:block;height:100%;background:#8fff72}
+.mon{position:absolute;width:124px;height:124px;border:5px solid #111;border-radius:24px;box-shadow:inset -14px -14px #0003,inset 8px 8px #fff4,0 18px 28px #0008;animation:bob 1.1s infinite steps(2)}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.mon:before,.mon:after{content:"";position:absolute;top:36px;width:15px;height:22px;background:#111;border-radius:4px}
+.mon:before{left:31px}.mon:after{right:31px}
+.mouth{position:absolute;left:41px;top:76px;width:38px;height:8px;background:#111;border-radius:8px}
+.ear{position:absolute;top:-16px;width:28px;height:40px;border:4px solid #111;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.ear.l{left:20px}.ear.r{right:20px}
+.tail{position:absolute;right:-24px;bottom:24px;width:42px;height:24px;border:4px solid #111;border-left:0;border-radius:0 20px 20px 0}
+#enemyMon{right:62px;top:120px}#myMon{left:50px;bottom:360px}
+.hit{animation:hit .25s steps(3)}@keyframes hit{50%{filter:brightness(2);transform:translateX(18px)}}
+.evo{animation:evo 1s}@keyframes evo{50%{filter:brightness(3);transform:scale(1.25) rotate(8deg)}}
+#battlePanel{position:absolute;left:8px;right:8px;bottom:8px;background:#17264c;border:4px solid #8ce4ff;border-radius:20px;padding:10px}
+#text{font-weight:800;min-height:44px;font-size:17px;margin-bottom:8px}
+#battleBtns,#moves{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-height:760px){#myMon{bottom:315px}#playerHud{bottom:230px}.mon{width:108px;height:108px}.panel{bottom:190px}}
 </style>
 </head>
 <body>
 <div id="game">
   <div id="start">
-    <div id="card">
-      <h1>Capsule Beasts</h1>
-      <p>Loop rond, ga naar donker gras en vang monsters.</p>
+    <div class="card">
+      <h1>Capsule Beasts 300</h1>
+      <p>300 monsters, elementen, zwaktes, status effects, captures, evoluties, Dex en save/load.</p>
       <button id="startBtn">Start avontuur</button>
     </div>
   </div>
 
   <div id="world">
-    <div id="top">Capsules: <span id="caps">5</span></div>
+    <div id="top">
+      <span id="loc">Grasslands</span>
+      <span>Caps: <span id="caps">12</span></span>
+      <button id="saveBtn">Save</button>
+      <button id="loadBtn">Load</button>
+      <button id="dexBtn">Dex</button>
+      <button id="bagBtn">Bag</button>
+    </div>
     <div id="map"></div>
     <div id="player"></div>
+
     <div id="dpad">
-      <button class="d" id="up">▲</button>
-      <button class="d" id="left">◀</button>
-      <button class="d" id="right">▶</button>
-      <button class="d" id="down">▼</button>
+      <button class="dp" id="up">▲</button>
+      <button class="dp" id="left">◀</button>
+      <button class="dp" id="right">▶</button>
+      <button class="dp" id="down">▼</button>
     </div>
-    <button id="act">Team</button>
+
+    <div id="rightBtns">
+      <button id="teamBtn">Team</button>
+      <button id="menuBtn">Menu</button>
+    </div>
+
+    <div id="teamPanel" class="panel"></div>
+    <div id="dexPanel" class="panel"></div>
+    <div id="bagPanel" class="panel"></div>
+    <div id="msgPanel" class="panel"></div>
   </div>
 
   <div id="battle">
-    <div id="enemyMon" class="monster"><div class="mouth"></div></div>
-    <div id="myMon" class="monster"><div class="mouth"></div></div>
+    <div id="enemyHud" class="hud"></div>
+    <div id="playerHud" class="hud"></div>
+    <div id="enemyMon" class="mon"><div class="mouth"></div></div>
+    <div id="myMon" class="mon"><div class="mouth"></div></div>
     <div id="battlePanel">
-      <div id="text">Een wild monster verschijnt!</div>
-      <div id="buttons">
-        <button id="fight">Vecht</button>
-        <button id="catch">Vang</button>
-        <button id="heal">Potion</button>
-        <button id="run">Vlucht</button>
+      <div id="text">Battle!</div>
+      <div id="battleBtns">
+        <button id="fightBtn">Vecht</button>
+        <button id="catchBtn">Vang</button>
+        <button id="capBtn">Capsule type</button>
+        <button id="runBtn">Vlucht</button>
       </div>
+      <div id="moves" style="display:none"></div>
     </div>
   </div>
 </div>
 
 <script>
-const mapData=[
-"WWWWWWWWWWWW",
-"W..........W",
-"W..gggg....W",
-"W..g..g..H.W",
-"W..g..g....W",
-"W....gggg..W",
-"W..........W",
-"WWWWWWWWWWWW"
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const ELEMENTS = ["Fire","Water","Nature","Electric","Ice","Shadow","Light","Earth","Wind","Metal","Psychic","Toxic"];
+
+const COLORS = {
+  Fire:"#ff6b4a", Water:"#4ab7ff", Nature:"#61d66f", Electric:"#ffd84a",
+  Ice:"#9df1ff", Shadow:"#6b54d6", Light:"#fff49a", Earth:"#a77a4f",
+  Wind:"#c8f2ff", Metal:"#aeb8c8", Psychic:"#ff8ee4", Toxic:"#9dff57"
+};
+
+const STRONG = {
+  Fire:["Nature","Ice"],
+  Water:["Fire","Earth"],
+  Nature:["Water","Earth"],
+  Electric:["Water","Wind"],
+  Ice:["Nature","Wind"],
+  Shadow:["Light","Psychic"],
+  Light:["Shadow","Toxic"],
+  Earth:["Electric","Metal"],
+  Wind:["Nature","Toxic"],
+  Metal:["Ice","Light"],
+  Psychic:["Metal","Toxic"],
+  Toxic:["Nature","Psychic"]
+};
+
+const RESIST = {
+  Fire:["Fire","Nature"],
+  Water:["Water","Ice"],
+  Nature:["Nature","Electric"],
+  Electric:["Electric","Metal"],
+  Ice:["Ice","Water"],
+  Shadow:["Shadow","Psychic"],
+  Light:["Light","Shadow"],
+  Earth:["Earth","Toxic"],
+  Wind:["Wind","Earth"],
+  Metal:["Metal","Nature"],
+  Psychic:["Psychic","Light"],
+  Toxic:["Toxic","Fire"]
+};
+
+const SYL = ["Axo","Luna","Pyro","Mizu","Terra","Venti","Noct","Lumi","Toxi","Ferro","Psy","Glaci","Bram","Zara","Kiro","Nebu","Volt","Moro","Cava","Rift"];
+const TAILS = ["ling","pup","rex","fin","horn","wing","shade","bloom","claw","geist","orb","moth","fang","shell","drake","root","spark","mire","nova","tail"];
+
+function moveSet(el){
+  const names = {
+    Fire:["Ember Jab","Flare Bite","Cinder Rush","Solar Burn"],
+    Water:["Bubble Hit","Tide Fang","Rain Spear","Aqua Surge"],
+    Nature:["Leaf Tap","Vine Hook","Spore Snap","Root Quake"],
+    Electric:["Static Pop","Volt Claw","Arc Dash","Storm Coil"],
+    Ice:["Snow Peck","Frost Jab","Ice Needle","Glacier Fall"],
+    Shadow:["Shade Tap","Night Bite","Eclipse Cut","Void Pulse"],
+    Light:["Glow Hit","Prism Kick","Halo Burst","Star Beam"],
+    Earth:["Pebble Toss","Mud Slam","Quake Paw","Meteor Bash"],
+    Wind:["Gust Peck","Air Slash","Cyclone Kick","Jet Spiral"],
+    Metal:["Iron Tap","Gear Claw","Steel Rush","Titan Crash"],
+    Psychic:["Mind Poke","Psi Flick","Dream Spear","Neuro Wave"],
+    Toxic:["Goo Tap","Venom Bite","Acid Spray","Plague Burst"]
+  }[el];
+
+  const statuses = ["burn","poison","freeze","stun","sleep"];
+  return names.map((name,i)=>({
+    name,
+    el,
+    power:[30,45,60,78][i],
+    status:i===2 ? statuses[ELEMENTS.indexOf(el)%statuses.length] : null
+  }));
+}
+
+function buildDex(){
+  const dex = [];
+  for(let i=0;i<300;i++){
+    const stage = i % 3;
+    const base = 30 + (i % 40) + stage * 12;
+    const el = ELEMENTS[i % ELEMENTS.length];
+    const el2 = i % 5 === 0 ? ELEMENTS[(i+4) % ELEMENTS.length] : null;
+    const lineStart = i - stage;
+
+    let evo = null;
+    let method = null;
+
+    if(stage < 2 && lineStart + stage + 1 < 300){
+      evo = lineStart + stage + 1;
+      method = stage === 0
+        ? (i % 4 === 0 ? "stone" : i % 7 === 0 ? "friendship" : "level")
+        : "level";
+    }
+
+    const name = SYL[i % SYL.length] + TAILS[(i*7) % TAILS.length] + (stage===1 ? "o" : stage===2 ? "ar" : "");
+
+    dex.push({
+      id:i,
+      name,
+      el,
+      el2,
+      color:COLORS[el],
+      accent:COLORS[el2 || el],
+      stage,
+      evo,
+      evoLevel: stage===0 ? 8 + (i % 10) : 20 + (i % 12),
+      method,
+      rarity:1 + (i % 6),
+      captureRate:80 - (i % 6) * 8 - stage * 7,
+      curve:["fast","medium","slow"][i % 3],
+      hp:base + 28,
+      atk:base + 8 + (i % 9),
+      def:base + 6 + ((i*3) % 9),
+      spd:base + 5 + ((i*5) % 9),
+      moves:moveSet(el)
+    });
+  }
+  return dex;
+}
+
+const DEX = buildDex();
+
+const MAP = [
+"################",
+"#....ggg...c..#",
+"#..ggg...www..#",
+"#..m..v...ww..#",
+"#..m..v..eee..#",
+"#..sss..ddd...#",
+"#..sss..ddd.H.#",
+"#......ggg....#",
+"################"
 ];
 
-const T=48;
-let x=2,y=2,caps=5,inBattle=false;
-const $=id=>document.getElementById(id);
+const BIOME = {
+  ".":"Grasslands",
+  g:"Grasslands",
+  m:"Caves",
+  v:"Volcano",
+  s:"Snow biome",
+  e:"Electric city",
+  d:"Dark forest",
+  c:"Crystal lake",
+  w:"Crystal lake",
+  H:"Town"
+};
+
+const ENCOUNTERS = {
+  "Grasslands":[0,1,2,3,36,37,72,73,108,109],
+  "Caves":[84,85,86,96,97,132,133,168,169],
+  "Volcano":[24,25,26,60,61,120,121,180,181],
+  "Snow biome":[48,49,50,144,145,192,193,240,241],
+  "Electric city":[3,4,5,39,40,41,156,157,252],
+  "Dark forest":[6,7,8,66,67,150,151,222,223],
+  "Crystal lake":[12,13,14,30,31,90,91,210,211]
+};
+
+let S = {
+  x:2,
+  y:2,
+  caps:{normal:12, ultra:4, dark:2, elemental:3},
+  capsule:"normal",
+  stones:3,
+  team:[],
+  box:[],
+  seen:{},
+  caught:{},
+  inBattle:false
+};
+
+let B = null;
+
+function maxHp(d,lvl){ return d.hp + lvl * 5; }
+function stat(d,lvl,k){ return d[k] + lvl * 3; }
+function xpNeed(lvl,curve){
+  if(curve === "fast") return 18 + lvl * lvl * 4;
+  if(curve === "slow") return 35 + lvl * lvl * 7;
+  return 25 + lvl * lvl * 5;
+}
+function makeMon(id,lvl){
+  const d = DEX[id];
+  return {
+    uid:Date.now()+Math.random(),
+    id,
+    lvl,
+    xp:0,
+    hp:maxHp(d,lvl),
+    status:null,
+    friend:0
+  };
+}
+
+function start(){
+  S.team = [makeMon(0,5), makeMon(3,4), makeMon(6,4)];
+  $("start").style.display = "none";
+  $("world").style.display = "block";
+  drawMap();
+  drawPlayer();
+  updateUi();
+}
 
 function drawMap(){
-  const m=$("map");
-  m.innerHTML="";
-  for(let r=0;r<mapData.length;r++){
-    for(let c=0;c<mapData[r].length;c++){
-      const ch=mapData[r][c];
-      const tile=document.createElement("div");
-      tile.className="tile "+(ch==="W"?"wall":ch==="g"?"grass":ch==="H"?"house":"");
-      tile.style.left=(c*T)+"px";
-      tile.style.top=(70+r*T)+"px";
-      m.appendChild(tile);
+  const map = $("map");
+  map.innerHTML = "";
+  for(let r=0;r<MAP.length;r++){
+    for(let c=0;c<MAP[r].length;c++){
+      const ch = MAP[r][c];
+      const tile = document.createElement("div");
+      tile.className = "tile " + (
+        ch==="#" ? "wall" :
+        ch==="g" ? "grass" :
+        ch==="w" ? "water" :
+        ch==="m" ? "cave" :
+        ch==="v" ? "volcano" :
+        ch==="s" ? "snow" :
+        ch==="e" ? "electric" :
+        ch==="d" ? "dark" :
+        ch==="c" ? "crystal" :
+        ch==="H" ? "town" : ""
+      );
+      tile.style.left = (c*48)+"px";
+      tile.style.top = (70+r*48)+"px";
+      map.appendChild(tile);
     }
   }
-  updatePlayer();
 }
 
-function updatePlayer(){
-  $("player").style.left=(x*T+7)+"px";
-  $("player").style.top=(70+y*T+2)+"px";
+function drawPlayer(){
+  $("player").style.left = (S.x*48+7)+"px";
+  $("player").style.top = (70+S.y*48+2)+"px";
 }
 
-function pass(nx,ny){
-  return mapData[ny] && mapData[ny][nx] && mapData[ny][nx] !== "W";
+function pass(x,y){
+  return MAP[y] && MAP[y][x] && MAP[y][x] !== "#";
+}
+
+function currentBiome(){
+  const b = BIOME[MAP[S.y][S.x]] || "Grasslands";
+  $("loc").textContent = b;
+  return b;
 }
 
 function move(dx,dy){
-  if(inBattle)return;
-  const nx=x+dx,ny=y+dy;
-  if(pass(nx,ny)){
-    x=nx;y=ny;
-    updatePlayer();
-    if(mapData[y][x]==="g" && Math.random()<0.35) startBattle();
+  if(S.inBattle) return;
+  const nx = S.x + dx;
+  const ny = S.y + dy;
+  if(!pass(nx,ny)) return;
+
+  S.x = nx;
+  S.y = ny;
+  drawPlayer();
+
+  const tile = MAP[S.y][S.x];
+  const biome = currentBiome();
+
+  if(tile !== "." && tile !== "H" && Math.random() < 0.28){
+    wildEncounter(biome);
+  }
+
+  if(tile === "H"){
+    S.team.forEach(m => m.hp = maxHp(DEX[m.id],m.lvl));
+    showMessage("Je team is volledig geheeld in Town.");
   }
 }
 
-function startBattle(){
-  inBattle=true;
-  $("battle").style.display="block";
-  $("text").innerText="Een wild Lunapup verschijnt!";
+function weightedPick(ids){
+  const pool = [];
+  ids.forEach(id=>{
+    const rarity = DEX[id].rarity;
+    for(let i=0;i<8-rarity;i++) pool.push(id);
+  });
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
-function endBattle(msg){
-  $("text").innerText=msg;
-  setTimeout(()=>{
-    $("battle").style.display="none";
-    inBattle=false;
-  },700);
+function wildEncounter(biome){
+  const ids = ENCOUNTERS[biome] || ENCOUNTERS["Grasslands"];
+  const id = weightedPick(ids);
+  const lvl = 3 + Math.floor(Math.random()*8);
+  startBattle(makeMon(id,lvl));
 }
 
-function attack(){
-  $("text").innerText="Jouw monster gebruikt Pixel Claw!";
-  $("enemyMon").style.transform="translateX(-30px)";
-  setTimeout(()=>{
-    $("enemyMon").style.transform="";
-    $("text").innerText="Het wilde monster is verzwakt!";
-  },250);
+function active(){
+  return S.team.find(m=>m.hp>0) || S.team[0];
+}
+
+function startBattle(enemy){
+  S.inBattle = true;
+  B = {enemy};
+  S.seen[enemy.id] = 1;
+
+  $("battle").style.display = "block";
+  $("moves").style.display = "none";
+  $("battleBtns").style.display = "grid";
+
+  setText("Een wilde " + DEX[enemy.id].name + " verschijnt!");
+  renderBattle();
+}
+
+function monsterArt(el,d){
+  el.style.background = d.color;
+  el.innerHTML = `
+    <div class="ear l" style="background:${d.accent}"></div>
+    <div class="ear r" style="background:${d.color}"></div>
+    <div class="tail" style="background:${d.accent}"></div>
+    <div class="mouth"></div>
+  `;
+}
+
+function hud(mon){
+  const d = DEX[mon.id];
+  const hpMax = maxHp(d,mon.lvl);
+  const hpPct = Math.max(0,mon.hp / hpMax * 100);
+  return `
+    <b>${d.name}</b> Lv.${mon.lvl}
+    <span class="tag">${d.el}${d.el2?"/"+d.el2:""}</span>
+    <div class="bar"><span style="width:${hpPct}%"></span></div>
+    <span class="small">HP ${Math.max(0,mon.hp)}/${hpMax} ${mon.status?"· "+mon.status:""}</span>
+  `;
+}
+
+function renderBattle(){
+  const p = active();
+  const e = B.enemy;
+
+  monsterArt($("myMon"),DEX[p.id]);
+  monsterArt($("enemyMon"),DEX[e.id]);
+
+  $("playerHud").innerHTML = hud(p);
+  $("enemyHud").innerHTML = hud(e);
+  updateUi();
+}
+
+function typeMultiplier(moveEl, defenderDex){
+  let m = 1;
+
+  if(STRONG[moveEl] && STRONG[moveEl].includes(defenderDex.el)) m *= 1.6;
+  if(defenderDex.el2 && STRONG[moveEl] && STRONG[moveEl].includes(defenderDex.el2)) m *= 1.35;
+
+  if(RESIST[defenderDex.el] && RESIST[defenderDex.el].includes(moveEl)) m *= 0.65;
+  if(defenderDex.el2 && RESIST[defenderDex.el2] && RESIST[defenderDex.el2].includes(moveEl)) m *= 0.75;
+
+  return m;
+}
+
+function damage(attacker,defender,move){
+  const ad = DEX[attacker.id];
+  const dd = DEX[defender.id];
+
+  const mult = typeMultiplier(move.el,dd);
+  const crit = Math.random() < 0.08 ? 1.8 : 1;
+  const dodge = Math.random() < Math.max(0.02,(stat(dd,defender.lvl,"spd") - stat(ad,attacker.lvl,"spd")) / 500);
+
+  if(dodge) return {amount:0,text:" miste!"};
+
+  const amount = Math.max(2,Math.floor(
+    stat(ad,attacker.lvl,"atk") /
+    Math.max(12,stat(dd,defender.lvl,"def")) *
+    move.power *
+    (0.85 + Math.random()*0.25) *
+    mult *
+    crit /
+    2.6
+  ));
+
+  return {
+    amount,
+    text:(mult>1.2 ? " Super effectief!" : mult<0.8 ? " Niet effectief." : "") + (crit>1 ? " Critical!" : "")
+  };
+}
+
+function setText(t){
+  $("text").textContent = t;
+}
+
+function showMoves(){
+  const p = active();
+  const d = DEX[p.id];
+
+  $("battleBtns").style.display = "none";
+  $("moves").style.display = "grid";
+
+  $("moves").innerHTML =
+    d.moves.map((m,i)=>`
+      <button onclick="useMove(${i})">
+        ${m.name}<br>
+        <span class="small">${m.el} ${m.power}</span>
+      </button>
+    `).join("") +
+    `<button onclick="backToBattleButtons()">Terug</button>`;
+}
+
+function backToBattleButtons(){
+  $("moves").style.display = "none";
+  $("battleBtns").style.display = "grid";
+}
+
+function applyStatus(target,move){
+  if(move.status && !target.status && Math.random()<0.35){
+    target.status = move.status;
+  }
+}
+
+function useMove(i){
+  const p = active();
+  const e = B.enemy;
+  const move = DEX[p.id].moves[i];
+
+  const r = damage(p,e,move);
+  if(r.amount){
+    e.hp -= r.amount;
+    applyStatus(e,move);
+    $("enemyMon").classList.add("hit");
+    setTimeout(()=>$("enemyMon").classList.remove("hit"),250);
+  }
+
+  setText(DEX[p.id].name + " gebruikt " + move.name + "." + r.text);
+  renderBattle();
+
+  if(e.hp<=0){
+    winBattle();
+    return;
+  }
+
+  setTimeout(enemyTurn,650);
+}
+
+function statusTick(mon){
+  if(!mon.status) return "";
+
+  const hpMax = maxHp(DEX[mon.id],mon.lvl);
+
+  if(mon.status==="burn" || mon.status==="poison"){
+    mon.hp -= Math.ceil(hpMax*0.06);
+    return mon.status + " doet schade.";
+  }
+
+  if(mon.status==="sleep" && Math.random()<0.45) return "slaapt nog.";
+  if(mon.status==="freeze" && Math.random()<0.45) return "is bevroren.";
+  if(mon.status==="stun" && Math.random()<0.35) return "is verlamd.";
+
+  return "";
+}
+
+function enemyTurn(){
+  const e = B.enemy;
+  const p = active();
+
+  const skip = statusTick(e);
+  if(e.hp<=0){
+    winBattle();
+    return;
+  }
+
+  if(skip){
+    setText(DEX[e.id].name + " " + skip);
+    renderBattle();
+    return;
+  }
+
+  const move = DEX[e.id].moves[Math.floor(Math.random()*4)];
+  const r = damage(e,p,move);
+
+  if(r.amount){
+    p.hp -= r.amount;
+    applyStatus(p,move);
+    $("myMon").classList.add("hit");
+    setTimeout(()=>$("myMon").classList.remove("hit"),250);
+  }
+
+  setText(DEX[e.id].name + " gebruikt " + move.name + "." + r.text);
+  renderBattle();
+
+  if(p.hp<=0 && !S.team.find(m=>m.hp>0)){
+    setText("Je team verloor. Town heelt je team.");
+    setTimeout(()=>{
+      S.team.forEach(m=>m.hp=maxHp(DEX[m.id],m.lvl));
+      endBattle();
+    },900);
+  }
+}
+
+function winBattle(){
+  const p = active();
+  const gain = 20 + B.enemy.lvl * 8;
+
+  p.xp += gain;
+  p.friend += 3;
+
+  setText(DEX[B.enemy.id].name + " verslagen. +" + gain + " XP");
+
+  levelUp(p).then(()=>setTimeout(endBattle,700));
+}
+
+async function levelUp(mon){
+  let d = DEX[mon.id];
+
+  while(mon.xp >= xpNeed(mon.lvl,d.curve)){
+    mon.xp -= xpNeed(mon.lvl,d.curve);
+    mon.lvl++;
+    mon.hp = maxHp(d,mon.lvl);
+    setText(d.name + " bereikt Lv." + mon.lvl);
+    await new Promise(r=>setTimeout(r,500));
+    checkEvolution(mon);
+    d = DEX[mon.id];
+  }
+}
+
+function checkEvolution(mon){
+  const d = DEX[mon.id];
+  if(d.evo === null) return false;
+
+  const ok =
+    (d.method==="level" && mon.lvl>=d.evoLevel) ||
+    (d.method==="stone" && S.stones>0 && mon.lvl>=d.evoLevel) ||
+    (d.method==="friendship" && mon.friend>=12);
+
+  if(!ok) return false;
+
+  if(d.method==="stone") S.stones--;
+
+  const old = d.name;
+  mon.id = d.evo;
+  mon.hp = maxHp(DEX[mon.id],mon.lvl);
+
+  $("myMon").classList.add("evo");
+  setTimeout(()=>$("myMon").classList.remove("evo"),1000);
+
+  setText(old + " evolueert naar " + DEX[mon.id].name + "!");
+  return true;
 }
 
 function capture(){
-  if(caps<=0){
-    $("text").innerText="Geen capsules meer!";
+  const e = B.enemy;
+  const d = DEX[e.id];
+
+  if(S.caps[S.capsule] <= 0){
+    setText("Geen " + S.capsule + " capsules.");
     return;
   }
-  caps--;
-  $("caps").innerText=caps;
-  const ok=Math.random()<0.65;
-  endBattle(ok ? "Monster gevangen!" : "Het monster ontsnapt.");
+
+  S.caps[S.capsule]--;
+
+  const hpRatio = e.hp / maxHp(d,e.lvl);
+  const bonus = {
+    normal:1,
+    ultra:1.7,
+    dark:d.el==="Shadow" ? 2 : 1,
+    elemental:d.el===DEX[active().id].el ? 1.8 : 1.25
+  }[S.capsule];
+
+  const statusBonus = e.status ? 1.25 : 1;
+  const chance = (d.captureRate/100) * (1.25-hpRatio) * bonus * statusBonus / (d.rarity*0.35);
+
+  setText("Je gooit een " + S.capsule + " capsule...");
+
+  setTimeout(()=>{
+    if(Math.random()<chance){
+      S.caught[e.id]=1;
+      const caught = JSON.parse(JSON.stringify(e));
+
+      if(S.team.length<6) S.team.push(caught);
+      else S.box.push(caught);
+
+      setText(d.name + " gevangen!");
+      setTimeout(endBattle,700);
+    } else {
+      setText(d.name + " breekt los!");
+      setTimeout(enemyTurn,600);
+    }
+    renderBattle();
+  },500);
 }
 
-function heal(){
-  $("text").innerText="Potion gebruikt. HP hersteld!";
+function endBattle(){
+  S.inBattle = false;
+  $("battle").style.display = "none";
+  $("moves").style.display = "none";
+  $("battleBtns").style.display = "grid";
+  updateUi();
 }
 
-function run(){
-  endBattle("Je bent gevlucht.");
+function chooseCapsule(){
+  const keys = Object.keys(S.caps);
+  const i = keys.indexOf(S.capsule);
+  S.capsule = keys[(i+1)%keys.length];
+  setText("Capsule type: " + S.capsule);
+  updateUi();
+}
+
+function updateUi(){
+  $("caps").textContent = `N${S.caps.normal} U${S.caps.ultra} D${S.caps.dark} E${S.caps.elemental}`;
+  currentBiome();
+}
+
+function closePanels(){
+  ["teamPanel","dexPanel","bagPanel","msgPanel"].forEach(id=>$(id).style.display="none");
+}
+
+function showTeam(){
+  const p = $("teamPanel");
+  const open = p.style.display === "block";
+  closePanels();
+  if(open) return;
+
+  p.style.display = "block";
+  p.innerHTML =
+    "<h3>Team</h3>" +
+    S.team.map((m,i)=>{
+      const d = DEX[m.id];
+      return `
+        <div class="row">
+          <span>
+            <span class="mini" style="background:${d.color}"></span>
+            ${i+1}. <b>${d.name}</b> Lv.${m.lvl}<br>
+            <span class="small">${d.el}${d.el2?"/"+d.el2:""} HP ${m.hp}/${maxHp(d,m.lvl)} XP ${m.xp}/${xpNeed(m.lvl,d.curve)}</span>
+          </span>
+          <button onclick="checkEvolution(S.team[${i}]);showTeam()">Evolve</button>
+        </div>
+      `;
+    }).join("") +
+    `<p>Box: ${S.box.length} · Rare stones: ${S.stones}</p>`;
+}
+
+function showDex(){
+  const p = $("dexPanel");
+  const open = p.style.display === "block";
+  closePanels();
+  if(open) return;
+
+  p.style.display = "block";
+  p.innerHTML =
+    `<h3>Monster Encyclopedia 300</h3>
+     <p>Gezien: ${Object.keys(S.seen).length}/300 · Gevangen: ${Object.keys(S.caught).length}/300</p>` +
+    DEX.map(d=>`
+      <div class="row">
+        <span>
+          <span class="mini" style="background:${d.color}"></span>
+          #${d.id+1} ${S.seen[d.id]||S.caught[d.id] ? d.name : "???"}
+        </span>
+        <span class="tag">${d.el}${d.el2?"/"+d.el2:""}</span>
+      </div>
+    `).join("");
+}
+
+function showBag(){
+  const p = $("bagPanel");
+  const open = p.style.display === "block";
+  closePanels();
+  if(open) return;
+
+  p.style.display = "block";
+  p.innerHTML = `
+    <h3>Inventory</h3>
+    <p>Normal capsules: ${S.caps.normal}</p>
+    <p>Ultra capsules: ${S.caps.ultra}</p>
+    <p>Dark capsules: ${S.caps.dark}</p>
+    <p>Elemental capsules: ${S.caps.elemental}</p>
+    <p>Rare stones: ${S.stones}</p>
+    <button onclick="buyPack()">Shop pack kopen</button>
+  `;
+}
+
+function buyPack(){
+  S.caps.normal += 5;
+  S.caps.ultra += 2;
+  S.stones += 1;
+  showBag();
+  updateUi();
+}
+
+function showMessage(text){
+  closePanels();
+  const p = $("msgPanel");
+  p.style.display = "block";
+  p.innerHTML = `<b>${text}</b><br><br><button onclick="closePanels()">OK</button>`;
+}
+
+function saveGame(){
+  localStorage.setItem("capsuleBeasts300",JSON.stringify(S));
+  showMessage("Game opgeslagen.");
+}
+
+function loadGame(){
+  const raw = localStorage.getItem("capsuleBeasts300");
+  if(!raw){
+    showMessage("Geen save gevonden.");
+    return;
+  }
+
+  S = JSON.parse(raw);
+  S.inBattle = false;
+
+  $("start").style.display = "none";
+  $("world").style.display = "block";
+  $("battle").style.display = "none";
+
+  drawMap();
+  drawPlayer();
+  updateUi();
+  showMessage("Save geladen.");
 }
 
 function bind(id,fn){
-  const el=$(id);
+  const el = $(id);
   el.addEventListener("click",fn);
   el.addEventListener("touchstart",e=>{
     e.preventDefault();
@@ -175,35 +817,30 @@ function bind(id,fn){
   },{passive:false});
 }
 
-$("startBtn").addEventListener("click",()=>{
-  $("start").style.display="none";
-  $("world").style.display="block";
-  drawMap();
-});
-
-$("startBtn").addEventListener("touchstart",e=>{
-  e.preventDefault();
-  $("start").style.display="none";
-  $("world").style.display="block";
-  drawMap();
-},{passive:false});
-
+bind("startBtn",start);
 bind("up",()=>move(0,-1));
 bind("down",()=>move(0,1));
 bind("left",()=>move(-1,0));
 bind("right",()=>move(1,0));
-bind("fight",attack);
-bind("catch",capture);
-bind("heal",heal);
-bind("run",run);
-bind("act",()=>alert("Team: Axoling Lv.5, Lunapup Lv.3"));
+bind("teamBtn",showTeam);
+bind("dexBtn",showDex);
+bind("bagBtn",showBag);
+bind("saveBtn",saveGame);
+bind("loadBtn",loadGame);
+bind("fightBtn",showMoves);
+bind("catchBtn",capture);
+bind("capBtn",chooseCapsule);
+bind("runBtn",endBattle);
+bind("menuBtn",()=>showMessage("Biomes: grasslands, caves, volcano, snow, electric city, dark forest en crystal lake. Loop op gekleurde tegels voor encounters."));
 
 window.addEventListener("keydown",e=>{
-  if(e.key==="ArrowUp")move(0,-1);
-  if(e.key==="ArrowDown")move(0,1);
-  if(e.key==="ArrowLeft")move(-1,0);
-  if(e.key==="ArrowRight")move(1,0);
+  if(e.key==="ArrowUp") move(0,-1);
+  if(e.key==="ArrowDown") move(0,1);
+  if(e.key==="ArrowLeft") move(-1,0);
+  if(e.key==="ArrowRight") move(1,0);
 });
 </script>
 </body>
 </html>
+
+
