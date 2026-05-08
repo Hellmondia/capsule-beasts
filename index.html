@@ -1,1 +1,209 @@
+Kopieer deze hele code in GitHub als index.html:
 
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Capsule Beasts</title>
+<style>
+body{margin:0;background:#0b1020;color:white;font-family:Arial;overflow:hidden}
+#game{position:fixed;inset:0;background:linear-gradient(#78a7ff 0 45%,#3f8a4a 46%)}
+#start{position:absolute;inset:0;background:#101827;display:flex;align-items:center;justify-content:center;z-index:10;text-align:center;padding:24px}
+#card{background:#1d2c55;border:4px solid #8ce4ff;border-radius:22px;padding:24px;max-width:420px}
+button{border:0;border-radius:14px;background:#3659a8;color:white;font-weight:bold;font-size:18px;padding:14px;margin:4px}
+#world{display:none}
+.tile{position:absolute;width:48px;height:48px;background:#4da35a;border:1px solid #35743f}
+.grass{background:#2f8b45}.wall{background:#26314f}.house{background:#d88d3a}
+#player{position:absolute;width:34px;height:42px;background:#2f7cff;border:4px solid #111;border-radius:10px;z-index:3}
+#player:before{content:"";position:absolute;left:6px;top:-16px;width:14px;height:14px;background:#ffd1ad;border:3px solid #111;border-radius:50%}
+#top{position:absolute;left:8px;right:8px;top:8px;background:#101827cc;border:2px solid #8ce4ff;border-radius:12px;padding:8px;font-weight:bold;z-index:4}
+#dpad{position:absolute;left:18px;bottom:22px;width:168px;height:168px;z-index:5}
+.d{position:absolute;width:56px;height:56px}
+#up{left:56px;top:0}#left{left:0;top:56px}#right{left:112px;top:56px}#down{left:56px;top:112px}
+#act{position:absolute;right:20px;bottom:52px;width:118px;height:70px;z-index:5}
+#battle{position:absolute;inset:0;background:linear-gradient(#7ea7ff 0 48%,#427c45 49%);display:none;z-index:8;padding:14px}
+.monster{position:absolute;width:120px;height:120px;border:5px solid #111;border-radius:24px;box-shadow:inset -12px -12px #0003,inset 8px 8px #fff4,0 18px 28px #0008}
+.monster:before,.monster:after{content:"";position:absolute;top:34px;width:15px;height:22px;background:#111;border-radius:4px}
+.monster:before{left:30px}.monster:after{right:30px}
+.mouth{position:absolute;left:40px;top:74px;width:38px;height:8px;background:#111;border-radius:8px}
+#enemyMon{right:46px;top:95px;background:#ffd84a}
+#myMon{left:38px;bottom:245px;background:#ff6b4a}
+#battlePanel{position:absolute;left:10px;right:10px;bottom:10px;background:#17264c;border:4px solid #8ce4ff;border-radius:20px;padding:12px}
+#text{font-size:18px;font-weight:bold;min-height:44px}
+#buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="start">
+    <div id="card">
+      <h1>Capsule Beasts</h1>
+      <p>Loop rond, ga naar donker gras en vang monsters.</p>
+      <button id="startBtn">Start avontuur</button>
+    </div>
+  </div>
+
+  <div id="world">
+    <div id="top">Capsules: <span id="caps">5</span></div>
+    <div id="map"></div>
+    <div id="player"></div>
+    <div id="dpad">
+      <button class="d" id="up">▲</button>
+      <button class="d" id="left">◀</button>
+      <button class="d" id="right">▶</button>
+      <button class="d" id="down">▼</button>
+    </div>
+    <button id="act">Team</button>
+  </div>
+
+  <div id="battle">
+    <div id="enemyMon" class="monster"><div class="mouth"></div></div>
+    <div id="myMon" class="monster"><div class="mouth"></div></div>
+    <div id="battlePanel">
+      <div id="text">Een wild monster verschijnt!</div>
+      <div id="buttons">
+        <button id="fight">Vecht</button>
+        <button id="catch">Vang</button>
+        <button id="heal">Potion</button>
+        <button id="run">Vlucht</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const mapData=[
+"WWWWWWWWWWWW",
+"W..........W",
+"W..gggg....W",
+"W..g..g..H.W",
+"W..g..g....W",
+"W....gggg..W",
+"W..........W",
+"WWWWWWWWWWWW"
+];
+
+const T=48;
+let x=2,y=2,caps=5,inBattle=false;
+const $=id=>document.getElementById(id);
+
+function drawMap(){
+  const m=$("map");
+  m.innerHTML="";
+  for(let r=0;r<mapData.length;r++){
+    for(let c=0;c<mapData[r].length;c++){
+      const ch=mapData[r][c];
+      const tile=document.createElement("div");
+      tile.className="tile "+(ch==="W"?"wall":ch==="g"?"grass":ch==="H"?"house":"");
+      tile.style.left=(c*T)+"px";
+      tile.style.top=(70+r*T)+"px";
+      m.appendChild(tile);
+    }
+  }
+  updatePlayer();
+}
+
+function updatePlayer(){
+  $("player").style.left=(x*T+7)+"px";
+  $("player").style.top=(70+y*T+2)+"px";
+}
+
+function pass(nx,ny){
+  return mapData[ny] && mapData[ny][nx] && mapData[ny][nx] !== "W";
+}
+
+function move(dx,dy){
+  if(inBattle)return;
+  const nx=x+dx,ny=y+dy;
+  if(pass(nx,ny)){
+    x=nx;y=ny;
+    updatePlayer();
+    if(mapData[y][x]==="g" && Math.random()<0.35) startBattle();
+  }
+}
+
+function startBattle(){
+  inBattle=true;
+  $("battle").style.display="block";
+  $("text").innerText="Een wild Lunapup verschijnt!";
+}
+
+function endBattle(msg){
+  $("text").innerText=msg;
+  setTimeout(()=>{
+    $("battle").style.display="none";
+    inBattle=false;
+  },700);
+}
+
+function attack(){
+  $("text").innerText="Jouw monster gebruikt Pixel Claw!";
+  $("enemyMon").style.transform="translateX(-30px)";
+  setTimeout(()=>{
+    $("enemyMon").style.transform="";
+    $("text").innerText="Het wilde monster is verzwakt!";
+  },250);
+}
+
+function capture(){
+  if(caps<=0){
+    $("text").innerText="Geen capsules meer!";
+    return;
+  }
+  caps--;
+  $("caps").innerText=caps;
+  const ok=Math.random()<0.65;
+  endBattle(ok ? "Monster gevangen!" : "Het monster ontsnapt.");
+}
+
+function heal(){
+  $("text").innerText="Potion gebruikt. HP hersteld!";
+}
+
+function run(){
+  endBattle("Je bent gevlucht.");
+}
+
+function bind(id,fn){
+  const el=$(id);
+  el.addEventListener("click",fn);
+  el.addEventListener("touchstart",e=>{
+    e.preventDefault();
+    fn();
+  },{passive:false});
+}
+
+$("startBtn").addEventListener("click",()=>{
+  $("start").style.display="none";
+  $("world").style.display="block";
+  drawMap();
+});
+
+$("startBtn").addEventListener("touchstart",e=>{
+  e.preventDefault();
+  $("start").style.display="none";
+  $("world").style.display="block";
+  drawMap();
+},{passive:false});
+
+bind("up",()=>move(0,-1));
+bind("down",()=>move(0,1));
+bind("left",()=>move(-1,0));
+bind("right",()=>move(1,0));
+bind("fight",attack);
+bind("catch",capture);
+bind("heal",heal);
+bind("run",run);
+bind("act",()=>alert("Team: Axoling Lv.5, Lunapup Lv.3"));
+
+window.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp")move(0,-1);
+  if(e.key==="ArrowDown")move(0,1);
+  if(e.key==="ArrowLeft")move(-1,0);
+  if(e.key==="ArrowRight")move(1,0);
+});
+</script>
+</body>
+</html>
